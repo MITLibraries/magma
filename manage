@@ -1,0 +1,15 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
+from flask.ext.script import Manager, Server
+
+from magma.app import create_app
+
+
+manager = Manager(create_app())
+manager.add_command("runserver", Server())
+
+
+if __name__ == "__main__":
+    manager.run()
