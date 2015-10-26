@@ -95,6 +95,28 @@ class FGDC(object):
             metc.append(etree.XML(_contact_info, parser=parser))
         return self
 
+    def ensure_elements(self):
+        elements = (
+            'idinfo/citation/citeinfo/origin',
+            'idinfo/citation/citeinfo/pubdata',
+            'idinfo/citation/citeinfo/title',
+            'idinfo/citation/citeinfo/pubinfo/publish',
+            'idinfo/citation/citeinfo/onlink',
+            'idinfo/descript/abstract',
+            'idinfo/descript/purpose',
+            'idinfo/timeperd/timeinfo/sngdate/caldate',
+            'idinfo/timeperd/current',
+            'idinfo/status/progress',
+            'idinfo/status/update',
+            'idinfo/keywords/theme/themekey',
+            'idinfo/keywords/place/placekey',
+            'idinfo/keywords/temporal/tempkey',
+            'eainfo/detailed/attr/attrdef',
+            'eainfo/detailed/attr/attrdefs',
+        )
+        for el in elements:
+            self._get_path(el)
+
     def _get_path(self, path):
         return get_path(path, self.root)
 
