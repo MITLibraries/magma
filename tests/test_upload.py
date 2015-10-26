@@ -158,3 +158,9 @@ def test_does_not_overwrite_metadata_contact():
     r.set_metadata_contact()
     assert r.doc.find('metainfo/metc/cntinfo/cntorgp/cntorg').text == \
         "Foobar"
+
+
+def test_ensures_elements_exist():
+    r = FGDC(StringIO('<metadata/>'))
+    r.ensure_elements()
+    assert r.doc.find('idinfo/citation/citeinfo/origin') is not None
