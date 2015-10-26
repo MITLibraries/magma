@@ -35,9 +35,12 @@ class Shapefile(object):
         return ("Vector", ogr.GeometryTypeToName(self.layer.GetGeomType()))
 
 
+parser = etree.XMLParser(remove_blank_text=True)
+
+
 class FGDC(object):
     def __init__(self, file):
-        self.doc = etree.parse(file)
+        self.doc = etree.parse(file, parser=parser)
         self.root = self.doc.getroot()
 
     def write(self):
@@ -80,16 +83,16 @@ class FGDC(object):
         return self
 
     def set_distribution(self):
-        distinfo = etree.XML(_distribution_info)
+        distinfo = etree.XML(_distribution_info, parser=parser)
         distrib = etree.SubElement(distinfo, 'distrib')
-        distrib.append(etree.XML(_contact_info))
+        distrib.append(etree.XML(_contact_info, parser=parser))
         self.root.append(distinfo)
         return self
 
     def set_metadata_contact(self):
         metc = self._get_path('metainfo/metc')
         if metc.find('cntinfo') is None:
-            metc.append(etree.XML(_contact_info))
+            metc.append(etree.XML(_contact_info, parser=parser))
         return self
 
     def _get_path(self, path):
