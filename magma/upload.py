@@ -117,6 +117,10 @@ class FGDC(object):
         for el in elements:
             self._get_path(el)
 
+    def set_restricted_access(self):
+        accconst = self._get_path('idinfo/accconst')
+        accconst.text = "Restricted Access Online: Access granted to Licensee only. Available only to MIT affiliates."
+
     def _get_path(self, path):
         return get_path(path, self.root)
 
