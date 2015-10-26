@@ -115,3 +115,46 @@ def test_does_not_overwrite_name():
     r = FGDC(doc)
     r.set_name('foobar')
     assert r.doc.find('idinfo/citation/citeinfo/ftname').text == 'foobaz'
+
+
+def test_sets_distribution():
+    r = FGDC(StringIO('<metadata/>'))
+    r.set_distribution()
+    assert r.doc.find('distinfo/distliab').text.startswith("Although this")
+
+
+def test_does_not_overwrite_distribution():
+    r = FGDC(StringIO("""
+        <metadata>
+          <distinfo>
+            <distliab>Something</distliab>
+          </distinfo>
+        </metadata>"""))
+    r.set_distribution()
+    distliabs = [e.text[:8] for e in r.doc.findall('distinfo/distliab')]
+    assert all([t in distliabs for t in ['Although', 'Somethin']])
+
+
+def test_sets_metadata_contact():
+    r = FGDC(StringIO('<metadata/>'))
+    r.set_metadata_contact()
+    assert r.doc.find('metainfo/metc/cntinfo/cntorgp/cntorg').text == \
+        "GIS Lab, MIT Libraries"
+
+
+def test_does_not_overwrite_metadata_contact():
+    r = FGDC(StringIO("""
+        <metadata>
+          <metainfo>
+            <metc>
+              <cntinfo>
+                <cntorgp>
+                  <cntorg>Foobar</cntorg>
+                </cntorgp>
+              </cntinfo>
+            </metc>
+          </metainfo>
+        </metadata>"""))
+    r.set_metadata_contact()
+    assert r.doc.find('metainfo/metc/cntinfo/cntorgp/cntorg').text == \
+        "Foobar"

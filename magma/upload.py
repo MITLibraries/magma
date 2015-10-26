@@ -79,6 +79,19 @@ class FGDC(object):
             ftname.text = name
         return self
 
+    def set_distribution(self):
+        distinfo = etree.XML(_distribution_info)
+        distrib = etree.SubElement(distinfo, 'distrib')
+        distrib.append(etree.XML(_contact_info))
+        self.root.append(distinfo)
+        return self
+
+    def set_metadata_contact(self):
+        metc = self._get_path('metainfo/metc')
+        if metc.find('cntinfo') is None:
+            metc.append(etree.XML(_contact_info))
+        return self
+
     def _get_path(self, path):
         return get_path(path, self.root)
 
@@ -87,8 +100,12 @@ def process(data, fgdc):
     files = glob.glob("%s/*.shp" % data)
     metadata = FGDC(fgdc)
     with closing(Shapefile(files[0])) as ds:
-        metadata.set_extent(ds.extent).set_data_type(ds.data_type)\
-            .set_attributes(ds.attributes).set_name(ds.name)
+        metadata.set_extent(ds.extent).\
+            set_data_type(ds.data_type).\
+            set_attributes(ds.attributes).\
+            set_name(ds.name).\
+            set_distribution().\
+            set_metadata_contact()
     return metadata
 
 
@@ -101,3 +118,27 @@ def get_or_set(root, child):
     if el is None:
         el = etree.SubElement(root, child)
     return el
+
+
+_distribution_info = """
+  <distinfo>
+    <distliab>Although this data is being distributed by MIT, no warranty expressed or implied is made by the Institute as to the accuracy of the data and related materials. The act of distribution shall not constitute any such warranty, and no responsibility is assumed by the Institute in the use of this data, or related materials.</distliab>
+  </distinfo>"""
+
+_contact_info = """
+  <cntinfo>
+    <cntorgp>
+      <cntorg>GIS Lab, MIT Libraries</cntorg>
+    </cntorgp>
+    <cntpos>GIS Specialist</cntpos>
+    <cntaddr>
+      <addrtype>mailing and physical address</addrtype>
+      <address>77 Massachusetts Avenue, Rotch Library, 7-238</address>
+      <city>Cambridge</city>
+      <state>MA</state>
+      <postal>02139-4307</postal>
+      <country>USA</country>
+    </cntaddr>
+    <cntvoice>617-258-5598</cntvoice>
+    <cntemail>gishelp@mit.edu</cntemail>
+  </cntinfo>"""
