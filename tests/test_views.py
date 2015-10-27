@@ -27,10 +27,25 @@ def test_submit_with_shapefile_without_metadata(testapp):
 def test_submit_without_shapefile(testapp):
     form = testapp.get('/').form
     res = form.submit()
-    assert 'The shapefile is required to proceed' in res
+    assert 'A datafile is required to proceed' in res
 
 def test_submit_with_invalid_shapefile(testapp):
     form = testapp.get('/').form
     form['data'] = Upload('tests/fixtures/fgdc.xml')
     res = form.submit()
-    assert 'File is not a zip file' in res
+    assert 'Uploaded datafile should be either a zipped shapefile or a GeoTIFF.' in res
+
+
+def test_submits_geotiff_with_metadata(testapp, geotiff, fgdc):
+    form = testapp.get('/').form
+    form['data'] = Upload(geotiff)
+    form['metadata'] = Upload(fgdc)
+    res = form.submit()
+    assert res.content_type == 'text/xml'
+
+
+def test_submits_geotiff_without_metadata(testapp, geotiff):
+    form = testapp.get('/').form
+    form['data'] = Upload(geotiff)
+    res = form.submit()
+    assert res.content_type == 'text/xml'
