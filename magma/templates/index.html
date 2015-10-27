@@ -11,6 +11,17 @@
         <div class="page-header">
             <h1>MAGMA <small>Minimally Automated Geospatial Metadata Author</small></h1>
         </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              {% for category, message in messages %}
+              <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+              </div>
+              {% endfor %}
+          {% endif %}
+        {% endwith %}
+
         <form method="POST" enctype="multipart/form-data" class="form-horizontal">
             <div class="form-group">
                 <label for="dataFile" class="col-md-2 control-label">Shapefile <span class="text-danger">*</span></label>
@@ -50,5 +61,10 @@
     </div>
     <script src="static/vendor/jquery/dist/jquery.min.js"></script>
     <script src="static/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>
+    $( "form" ).submit(function( event ) {
+      $(".alert").remove();
+    });
+    </script>
 </body>
 </html>
