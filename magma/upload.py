@@ -3,8 +3,9 @@ from __future__ import absolute_import
 from contextlib import closing
 from functools import reduce
 import glob
+import os
 
-from osgeo import ogr
+from osgeo import ogr, gdal
 from lxml import etree
 
 
@@ -33,6 +34,32 @@ class Shapefile(object):
     @property
     def data_type(self):
         return ("Vector", ogr.GeometryTypeToName(self.layer.GetGeomType()))
+
+
+class GeoTIFF(object):
+    attributes = None
+
+    def __init__(self, file):
+        self.ds = gdal.Open(file)
+
+    @property
+    def name(self):
+        return os.path.basename(self.ds.GetDescription())
+
+    @property
+    def extent(self):
+        xform = self.ds.GetGeoTransform()
+        upper_left = xform[0], xform[3]
+        lower_right = transform_point(xform, self.ds.RasterXSize,
+                                      self.ds.RasterYSize)
+        return upper_left[0], lower_right[0], lower_right[1], upper_left[1]
+
+    @property
+    def data_type(self):
+        return 'Raster', 'Pixel'
+
+    def close(self):
+        self.ds = None
 
 
 parser = etree.XMLParser(remove_blank_text=True)
@@ -171,3 +198,9 @@ _contact_info = """
     <cntvoice>617-258-5598</cntvoice>
     <cntemail>gishelp@mit.edu</cntemail>
   </cntinfo>"""
+
+
+def transform_point(xform, x, y):
+    geo_x = xform[0] + x * xform[1] + y * xform[2]
+    geo_y = xform[3] + x * xform[4] + y * xform[5]
+    return geo_x, geo_y

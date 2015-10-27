@@ -8,12 +8,18 @@ except ImportError:
 
 import pytest
 
-from magma.upload import Shapefile, FGDC
+from magma.upload import Shapefile, FGDC, GeoTIFF
 
 
 @pytest.yield_fixture
 def shp(shapefile):
     with closing(Shapefile(shapefile)) as datasource:
+        yield datasource
+
+
+@pytest.yield_fixture
+def tif(geotiff):
+    with closing(GeoTIFF(geotiff)) as datasource:
         yield datasource
 
 
@@ -32,6 +38,22 @@ def test_shapefile_has_extent(shp):
 
 def test_shapefile_has_data_type(shp):
     assert shp.data_type == ('Vector', 'Point')
+
+
+def test_raster_has_name(tif):
+    assert tif.name == 'grayscale.tif'
+
+
+def test_raster_returns_none_for_attributes(tif):
+    assert tif.attributes is None
+
+
+def test_raster_has_extent(tif):
+    assert tif.extent == (-80.0, -60.0, 35.0, 45.0)
+
+
+def test_raster_has_data_type(tif):
+    assert tif.data_type == ('Raster', 'Pixel')
 
 
 def test_sets_extent():
