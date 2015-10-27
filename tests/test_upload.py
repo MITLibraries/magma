@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+
 from contextlib import closing
+
+import pytest
+
+from magma.upload import FGDC, GeoTIFF, Shapefile
+
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-
-import pytest
-
-from magma.upload import Shapefile, FGDC, GeoTIFF
 
 
 @pytest.yield_fixture

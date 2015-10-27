@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-from functools import reduce
+
 import glob
 import os
+from functools import reduce
 from zipfile import ZipFile
 
-from osgeo import ogr, gdal
 from lxml import etree
+from osgeo import gdal, ogr
 
 from magma import UnsupportedFormat
 
