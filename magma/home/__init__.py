@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-import tempfile
-import shutil
+
 import os
-from zipfile import BadZipfile
+import shutil
+import tempfile
 from contextlib import closing
+from zipfile import BadZipfile
+
+from flask import (Blueprint, flash, make_response, render_template, request,)
+from werkzeug import secure_filename
+
+from magma import UnsupportedFormat
+from magma.upload import datasource, process
+
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-
-from flask import (Blueprint, flash, request, render_template, make_response,
-                   session,)
-from werkzeug import secure_filename
-
-from magma.upload import process, datasource
-from magma import UnsupportedFormat
 
 
 home_page = Blueprint('home_page', __name__)
