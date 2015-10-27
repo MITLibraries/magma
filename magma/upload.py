@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
-from contextlib import closing
 from functools import reduce
 import glob
 import os
+from zipfile import ZipFile
 
 from osgeo import ogr, gdal
 from lxml import etree
+
+from magma import UnsupportedFormat
 
 
 class Shapefile(object):
@@ -37,7 +39,7 @@ class Shapefile(object):
 
 
 class GeoTIFF(object):
-    attributes = None
+    attributes = []
 
     def __init__(self, file):
         self.ds = gdal.Open(file)
@@ -152,17 +154,31 @@ class FGDC(object):
         return get_path(path, self.root)
 
 
-def process(data, fgdc):
-    files = glob.glob("%s/*.shp" % data)
+def process(ds, fgdc):
     metadata = FGDC(fgdc)
-    with closing(Shapefile(files[0])) as ds:
-        metadata.set_extent(ds.extent).\
-            set_data_type(ds.data_type).\
-            set_attributes(ds.attributes).\
-            set_name(ds.name).\
-            set_distribution().\
-            set_metadata_contact()
+    metadata.set_extent(ds.extent).\
+        set_data_type(ds.data_type).\
+        set_attributes(ds.attributes).\
+        set_name(ds.name).\
+        set_distribution().\
+        set_metadata_contact()
     return metadata
+
+
+def datasource(datafile):
+    ext = os.path.splitext(datafile)[1]
+    if ext == '.zip':
+        extract_dir = os.path.abspath(os.path.dirname(datafile))
+        archive = ZipFile(datafile, 'r')
+        try:
+            archive.extractall(extract_dir)
+        finally:
+            archive.close()
+        shpfile = glob.glob("%s/*.shp" % extract_dir)[0]
+        return Shapefile(shpfile)
+    elif ext in ('.tif', '.tiff'):
+        return GeoTIFF(datafile)
+    raise UnsupportedFormat
 
 
 def get_path(path, root):

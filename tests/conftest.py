@@ -32,6 +32,11 @@ def geotiff():
     return _fixtures('grayscale.tif')
 
 
+@pytest.fixture
+def fgdc():
+    return _fixtures('fgdc.xml')
+
+
 def _fixtures(path):
     current_dir = os.path.dirname(os.path.realpath(__file__))
     return os.path.join(current_dir, 'fixtures', path)

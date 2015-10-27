@@ -44,8 +44,8 @@ def test_raster_has_name(tif):
     assert tif.name == 'grayscale.tif'
 
 
-def test_raster_returns_none_for_attributes(tif):
-    assert tif.attributes is None
+def test_raster_has_empty_attributes(tif):
+    assert tif.attributes == []
 
 
 def test_raster_has_extent(tif):
