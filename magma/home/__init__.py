@@ -37,6 +37,8 @@ def index():
             metadata = process(tmp, fgdc)
         finally:
             shutil.rmtree(tmp)
+        if request.form['access'] == 'restricted':
+            metadata.set_restricted_access()
         response = make_response(metadata.write())
         response.headers['Content-type'] = 'text/xml'
         response.headers['Content-Disposition'] = 'attachment; filename=fgdc.xml'

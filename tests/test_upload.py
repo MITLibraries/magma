@@ -164,3 +164,14 @@ def test_ensures_elements_exist():
     r = FGDC(StringIO('<metadata/>'))
     r.ensure_elements()
     assert r.doc.find('idinfo/citation/citeinfo/origin') is not None
+
+
+def test_sets_restricted_access():
+    r = FGDC(StringIO("""
+        <metadata>
+          <idinfo>
+            <accconst>Foobar</accconst>
+          </idinfo>
+         </metadata>"""))
+    r.set_restricted_access()
+    assert r.doc.find('idinfo/accconst').text == "Restricted Access Online: Access granted to Licensee only. Available only to MIT affiliates."
