@@ -1,1 +1,1 @@
-web: gunicorn magma.wsgi --log-file=-
+web: gunicorn -t 60 magma.wsgi --log-file=-
