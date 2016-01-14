@@ -157,13 +157,14 @@ class FGDC(object):
         return get_path(path, self.root)
 
 
-def process(ds, fgdc):
+def process(fgdc, ds=None):
     metadata = FGDC(fgdc)
-    metadata.set_extent(ds.extent).\
-        set_data_type(ds.data_type).\
-        set_attributes(ds.attributes).\
-        set_name(ds.name).\
-        set_distribution().\
+    if ds:
+        metadata.set_extent(ds.extent).\
+            set_data_type(ds.data_type).\
+            set_attributes(ds.attributes).\
+            set_name(ds.name)
+    metadata.set_distribution().\
         set_metadata_contact().\
         ensure_elements()
     return metadata
