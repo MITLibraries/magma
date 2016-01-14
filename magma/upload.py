@@ -146,10 +146,12 @@ class FGDC(object):
         )
         for el in elements:
             self._get_path(el)
+        return self
 
     def set_restricted_access(self):
         accconst = self._get_path('idinfo/accconst')
         accconst.text = "Restricted Access Online: Access granted to Licensee only. Available only to MIT affiliates."
+        return self
 
     def _get_path(self, path):
         return get_path(path, self.root)
@@ -162,7 +164,8 @@ def process(ds, fgdc):
         set_attributes(ds.attributes).\
         set_name(ds.name).\
         set_distribution().\
-        set_metadata_contact()
+        set_metadata_contact().\
+        ensure_elements()
     return metadata
 
 
