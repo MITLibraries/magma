@@ -25,31 +25,36 @@ home_page = Blueprint('home_page', __name__)
 @home_page.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        if 'data' in request.files and request.files['data']:
-            datafile = request.files['data']
-        else:
-            flash('A datafile is required to proceed.', 'danger')
+        datafile = request.files.get('data')
+        metadata = request.files.get('metadata')
+        if not (datafile or metadata):
+            flash('A datafile or FGDC file is required to proceed.', 'danger')
             return render_template('index.html')
-        fgdc = request.files.get('metadata') or StringIO('<metadata/>')
+        fgdc = metadata or StringIO('<metadata/>')
 
-        tmp = tempfile.mkdtemp()
-        filename = os.path.join(tmp, secure_filename(datafile.filename))
-        datafile.save(filename)
+        if datafile:
+            tmp = tempfile.mkdtemp()
+            filename = os.path.join(tmp, secure_filename(datafile.filename))
+            datafile.save(filename)
+            try:
+                with closing(datasource(filename)) as ds:
+                    metadata = process(fgdc, ds)
+            except BadZipfile:
+                flash('Could not open zipfile.', 'danger')
+                return render_template('index.html')
+            except UnsupportedFormat:
+                flash('Uploaded datafile should be either a zipped shapefile or a GeoTIFF.', 'danger')
+                return render_template('index.html')
+            finally:
+                shutil.rmtree(tmp)
+        else:
+            metadata = process(fgdc)
+        if request.form['access'] == 'restricted':
+            metadata.set_restricted_access()
+        response = make_response(metadata.write())
+        response.headers['Content-type'] = 'text/xml'
+        response.headers['Content-Disposition'] = \
+            'attachment; filename=fgdc.xml'
+        return response
 
-        try:
-            with closing(datasource(filename)) as ds:
-                metadata = process(ds, fgdc)
-            if request.form['access'] == 'restricted':
-                metadata.set_restricted_access()
-            response = make_response(metadata.write())
-            response.headers['Content-type'] = 'text/xml'
-            response.headers['Content-Disposition'] = \
-                'attachment; filename=fgdc.xml'
-            return response
-        except BadZipfile:
-            flash('Could not open zipfile.', 'danger')
-        except UnsupportedFormat:
-            flash('Uploaded datafile should be either a zipped shapefile or a GeoTIFF.', 'danger')
-        finally:
-            shutil.rmtree(tmp)
     return render_template('index.html')

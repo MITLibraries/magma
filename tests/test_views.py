@@ -25,10 +25,11 @@ def test_submit_with_shapefile_without_metadata(testapp):
     assert res.content_type == 'text/xml'
 
 
-def test_submit_without_shapefile(testapp):
+def test_submit_metadata_without_shapefile(testapp, fgdc):
     form = testapp.get('/').form
+    form['metadata'] = Upload(fgdc)
     res = form.submit()
-    assert 'A datafile is required to proceed' in res
+    assert res.content_type == 'text/xml'
 
 
 def test_submit_with_invalid_shapefile(testapp):
@@ -51,3 +52,17 @@ def test_submits_geotiff_without_metadata(testapp, geotiff):
     form['data'] = Upload(geotiff)
     res = form.submit()
     assert res.content_type == 'text/xml'
+
+
+def test_submit_requires_datafile_or_metadata(testapp):
+    form = testapp.get('/').form
+    res = form.submit()
+    assert 'A datafile or FGDC file is required' in res
+
+
+def test_submit_sets_restricted_access(testapp, fgdc):
+    form = testapp.get('/').form
+    form['metadata'] = Upload(fgdc)
+    form['access'] = 'restricted'
+    res = form.submit()
+    assert 'Restricted Access Online' in res.lxml.find('idinfo/accconst').text

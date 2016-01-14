@@ -202,5 +202,5 @@ def test_sets_restricted_access():
 
 
 def test_process_ensures_elements_exist(shp):
-    r = process(shp, StringIO("<metadata/>"))
+    r = process(StringIO("<metadata/>"), shp)
     assert r.doc.find('idinfo/keywords/theme/themekey') is not None
