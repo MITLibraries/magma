@@ -141,6 +141,7 @@ class FGDC(object):
             'idinfo/keywords/theme/themekey',
             'idinfo/keywords/place/placekey',
             'idinfo/keywords/temporal/tempkey',
+            'idinfo/ptcontac',
             'eainfo/detailed/attr/attrdef',
             'eainfo/detailed/attr/attrdefs',
         )
