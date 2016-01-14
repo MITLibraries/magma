@@ -5,7 +5,7 @@ from contextlib import closing
 
 import pytest
 
-from magma.upload import FGDC, GeoTIFF, Shapefile
+from magma.upload import FGDC, GeoTIFF, Shapefile, process
 
 try:
     from StringIO import StringIO
@@ -199,3 +199,8 @@ def test_sets_restricted_access():
          </metadata>"""))
     r.set_restricted_access()
     assert r.doc.find('idinfo/accconst').text == "Restricted Access Online: Access granted to Licensee only. Available only to MIT affiliates."
+
+
+def test_process_ensures_elements_exist(shp):
+    r = process(shp, StringIO("<metadata/>"))
+    assert r.doc.find('idinfo/keywords/theme/themekey') is not None
