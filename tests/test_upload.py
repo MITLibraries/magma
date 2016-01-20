@@ -201,6 +201,25 @@ def test_sets_restricted_access():
     assert r.doc.find('idinfo/accconst').text == "Restricted Access Online: Access granted to Licensee only. Available only to MIT affiliates."
 
 
+def test_adds_empty_keyword():
+    r = FGDC(StringIO("""
+        <metadata>
+          <idinfo>
+            <keywords>
+              <theme>
+                <themekey>Foo</themekey>
+              </theme>
+              <place>
+                <placekey>Bar</placekey>
+              </place>
+            </keywords>
+          </idinfo>
+        </metadata>"""))
+    r.add_keywords()
+    assert len(r.doc.findall('idinfo/keywords/theme')) == 2
+    assert len(r.doc.findall('idinfo/keywords/place')) == 2
+
+
 def test_process_ensures_elements_exist(shp):
     r = process(StringIO("<metadata/>"), shp)
-    assert r.doc.find('idinfo/keywords/theme/themekey') is not None
+    assert r.doc.find('idinfo/descript/purpose') is not None

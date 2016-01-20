@@ -154,6 +154,16 @@ class FGDC(object):
         accconst.text = "Restricted Access Online: Access granted to Licensee only. Available only to MIT affiliates."
         return self
 
+    def add_keywords(self):
+        keywords = self._get_path('idinfo/keywords')
+        theme = etree.SubElement(keywords, 'theme')
+        etree.SubElement(theme, 'themekt')
+        etree.SubElement(theme, 'themekey')
+        place = etree.SubElement(keywords, 'place')
+        etree.SubElement(place, 'placekt')
+        etree.SubElement(place, 'placekey')
+        return self
+
     def _get_path(self, path):
         return get_path(path, self.root)
 
@@ -167,6 +177,7 @@ def process(fgdc, ds=None):
             set_name(ds.name)
     metadata.set_distribution().\
         set_metadata_contact().\
+        add_keywords().\
         ensure_elements()
     return metadata
 
