@@ -138,8 +138,6 @@ class FGDC(object):
             'idinfo/timeperd/current',
             'idinfo/status/progress',
             'idinfo/status/update',
-            'idinfo/keywords/theme/themekey',
-            'idinfo/keywords/place/placekey',
             'idinfo/keywords/temporal/tempkey',
             'idinfo/ptcontac',
             'eainfo/detailed/attr/attrdef',
@@ -155,13 +153,10 @@ class FGDC(object):
         return self
 
     def add_keywords(self):
-        keywords = self._get_path('idinfo/keywords')
-        theme = etree.SubElement(keywords, 'theme')
-        etree.SubElement(theme, 'themekt')
-        etree.SubElement(theme, 'themekey')
-        place = etree.SubElement(keywords, 'place')
-        etree.SubElement(place, 'placekt')
-        etree.SubElement(place, 'placekey')
+        themekey = self._get_path('idinfo/keywords/theme/themekey')
+        themekey.addprevious(etree.Element('themekt'))
+        placekey = self._get_path('idinfo/keywords/place/placekey')
+        placekey.addprevious(etree.Element('placekt'))
         return self
 
     def _get_path(self, path):
